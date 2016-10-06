@@ -18,22 +18,24 @@ import webapp2
 import templateUtils
 import account
 
-
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        count=0
+        count = 0
         # count = account.get_users_count()
         # if (count < 30):
         #     account.init_users()
         userss = account.get_users()
         usernames = ""
         for user in userss:
-            usernames += str(user.username) + "--" + str(user.password) + "--" + str(user.email)+"--"+str(user.created) + "<br>"
+            usernames += str(user.username) + "--" + str(user.password) + "--" + str(user.email) + "--" + str(
+                user.created) + "<br>"
         self.response.write(templateUtils.reder_str("header.html", head="hello david", hello="david"))
         self.response.write(usernames)
         self.response.write("users count:" + str(count))
         self
         account.delete_all()
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
