@@ -2,6 +2,7 @@
 user module
 """
 from google.appengine.ext import db
+import hashlib
 
 
 class User(db.Model):
@@ -32,6 +33,11 @@ def get_users():
     return users
 
 
+def get_user_by_username(username):
+    user = User.all().filter('username =', username).get()
+    return user
+
+
 def delete_all():
     # users = db.GqlQuery("select * from User")
     users = User.all()
@@ -52,6 +58,8 @@ def add_user(**params):
     if password == 'none' or password == '' or password is None:
         return "password is none is not allowed"
     email = params.get('email', '')
+    # encrypt password and save
+    password = encrypt_password(password)
     u = User(username=username, password=password, email=email)
     u.put()
     # print username
@@ -71,9 +79,14 @@ def check_username(username):
         return "success"
 
 
+# define the password salt
+password_salt = "udacity-password"
+
+
 # encrypt_password
 def encrypt_password(password):
-    pass
+    # return password+salt hash
+    return hashlib.md5(password + password_salt).hexdigest()
 
 
 def prepare_insert_sql(**params):
@@ -81,7 +94,7 @@ def prepare_insert_sql(**params):
 
 
 # log in blog
-# if log in success return the user
+# if log in success return the user type
 # log in faile return the faild information
 def login(**params):
     username = params.get('username', 'none')
@@ -93,6 +106,8 @@ def login(**params):
         if password is None or password == 'none':
             return "password is none"
         # log in check
+        # password encrypt and check
+        password = encrypt_password(password)
         u = User.all().filter("password =", password).filter("username =", username).get()
         if u is not None:
             # log in success

@@ -18,14 +18,15 @@ import webapp2
 import templateUtils
 import account
 import strUtils
-
+import cookie
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+
         # count = 0
-        # # count = account.get_users_count()
-        # # if (count < 30):
-        # #     account.init_users()
+        # count = account.get_users_count()
+        # if (count < 30):
+        #    account.init_users()
         # result = account.add_user(username="abc", password="david", email="admin@dxscx.com")
         # self.response.write(result)
         userss = account.get_users()
@@ -35,8 +36,12 @@ class MainHandler(webapp2.RequestHandler):
                 user.created) + "<br>"
         self.response.write(templateUtils.reder_str("header.html", head="hello david", hello="david"))
         self.response.write(usernames)
-        # self.response.write("users count:" + str(count) + "<br>")
-        
+        #self.response.write(account.add_user(username="test", password="test", email="admin@dxscx.com"))
+        #self.response.write("login info"+account.login(username="test", password="test")+"<br>")
+        usercookie = account.login(username="test", password="test")
+        #self.response.write(self.request.cookies.get('user'))
+        cookie.set_cookie(self,usercookie.username.encode('utf-8'))
+        self.response.write(cookie.check_cookie(self))
 
 
 app = webapp2.WSGIApplication([
