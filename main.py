@@ -40,7 +40,8 @@ class MainHandler(webapp2.RequestHandler):
         #self.response.write("login info"+account.login(username="test", password="test")+"<br>")
         usercookie = account.login(username="test", password="test")
         #self.response.write(self.request.cookies.get('user'))
-        cookie.set_cookie(self,usercookie.username.encode('utf-8'))
+        if usercookie:
+           cookie.set_cookie(self,usercookie.username.encode('utf-8'))
         self.response.write(cookie.check_cookie(self))
 
 
