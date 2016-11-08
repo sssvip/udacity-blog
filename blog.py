@@ -9,7 +9,7 @@ class Blog(db.Model):
     id = db.IntegerProperty(required=True)
     username = db.StringProperty(required=True)
     title = db.StringProperty(required=True)
-    content = db.StringProperty(required=True)
+    content = db.StringProperty(required=True,multiline=True)
     created = db.DateTimeProperty(auto_now_add=True)
     last_modified = db.DateTimeProperty(auto_now=True)
 
