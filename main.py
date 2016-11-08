@@ -358,8 +358,9 @@ class Like(webapp2.RequestHandler):
         self.response.write(result)
 
 
+# ('/allusers', AllUsers),('/allcomments', AllComments), not open on official condition
 app = webapp2.WSGIApplication(
     [('/', MainPage), ('/welcome', Welcome), ('/signup', Signup), ('/login', Login), ('/logout', Logout),
-     ('/allusers', AllUsers), ('/blog', Blog), ('/allblog', AllBlog), ('/myblog', MyBlogs), ('/comment', Comment),
-     ('/allcomments', AllComments), ('/like', Like)],
+     ('/blog', Blog), ('/allblog', AllBlog), ('/myblog', MyBlogs), ('/comment', Comment),
+     ('/like', Like)],
     debug=True)
