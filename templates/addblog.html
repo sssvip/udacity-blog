@@ -1,20 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>new post</h2>
-    <div class="error">{{ error }}</div>
-    <form method="post">
-        <label>
-            <div>Title</div>
-            <input type="text" name="title" value="{{ title }}">
-        </label>
-
-        <label>
-            <div>Content</div>
-            <textarea name="content">{{ content }}</textarea>
-        </label>
-
-
-        <input type="submit">
-    </form>
+<h2>new post</h2>
+<div class="error">{{ error }}</div>
+<form method="post">
+    <b style="font-size: 30px;">Title:</b>
+    <br>
+    <input style="height: 50px;width: 700px;" type="text" name="title" value="{{ title }}">
+    <br>
+    <b style="font-size: 30px;">Content:</b>
+    <br>
+    <textarea style="height: 300px;width: 700px;" name="content">{{ content }}</textarea>
+    <br>
+    <input style="font-size: 20px;" type="submit">
+</form>
 {% endblock %}

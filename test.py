@@ -153,7 +153,7 @@ class Addblog(webapp2.RequestHandler):
         params['username'] = cookie.get_username(self)
         result = blog.add_blog(**params)
         if result == 'success':
-            self.redirect('/blog')
+            self.redirect('/myblog')
         else:
             params['error'] = result
             self.response.write(templateUtils.reder_str("addblog.html", **params))
@@ -173,12 +173,37 @@ class AllBlogs(webapp2.RequestHandler):
                     temp_blog.comments.append(comment)
             # add like to the blog
             like_count = like.get_like_count_by_blog_id(1, temp_blog.id)
-            dislike_count = like.get_like_count_by_blog_id(1, temp_blog.id)
+            dislike_count = like.get_like_count_by_blog_id(0, temp_blog.id)
             temp_blog.like_count = like_count
             temp_blog.dislike_count = dislike_count
             blogs_with_comments_and_like.append(temp_blog)
         params = dict(blogs=blogs_with_comments_and_like)
         self.response.write(templateUtils.reder_str("blog.html", **params))
+
+
+# this is to list all blogs in the db
+class MyBlogs(webapp2.RequestHandler):
+    def get(self):
+        # check user login
+        cookie.check_login(self)
+        username = cookie.get_username(self);
+        blogs_with_comments_and_like = list()
+        blogs = blog.get_blog_by_username(username)
+        for temp_blog in blogs:
+            temp_blog.comments = list()
+            all_comments = comments.get_comments_by_blog_id(temp_blog.id)
+            # add comment to the blog
+            if all_comments is not None:
+                for comment in all_comments:
+                    temp_blog.comments.append(comment)
+            # add like to the blog
+            like_count = like.get_like_count_by_blog_id(1, temp_blog.id)
+            dislike_count = like.get_like_count_by_blog_id(0, temp_blog.id)
+            temp_blog.like_count = like_count
+            temp_blog.dislike_count = dislike_count
+            blogs_with_comments_and_like.append(temp_blog)
+        params = dict(blogs=blogs_with_comments_and_like)
+        self.response.write(templateUtils.reder_str("myblog.html", **params))
 
 
 # this is interface to the ajax deliver data
@@ -232,7 +257,7 @@ class Comment(webapp2.RequestHandler):
         # update it
         comment.content = content
         comment.put()
-        self.response.write("update success")
+        self.response.write("success")
 
     # through delete method to update comment
     def delete(self):
@@ -255,7 +280,7 @@ class Comment(webapp2.RequestHandler):
             return
         # delete it
         comment.delete()
-        self.response.write("delete success")
+        self.response.write("success")
 
 
 # this is to test to list all comment in the db
@@ -269,8 +294,28 @@ class AllComments(webapp2.RequestHandler):
         self.response.write(temp_str)
 
 
+# this is add or update like
+class Like(webapp2.RequestHandler):
+    def post(self):
+        # check login
+        username = cookie.get_username(self)
+        if username is False:
+            self.response.write("please login...")
+            return
+        blog_id = self.request.get("blog_id", '')
+        if blog_id == '':
+            self.response.write("blog_id value is not allowed null value")
+            return
+        islike = self.request.get("islike", '')
+        if islike == '':
+            self.response.write("islike value is not allowed null value")
+            return
+        result = like.add_or_update_like(int(islike), username=username, blog_id=int(blog_id))
+        self.response.write(result)
+
+
 app = webapp2.WSGIApplication(
     [('/', MainPage), ('/welcome', Welcome), ('/signup', Signup), ('/login', Login), ('/logout', Logout),
-     ('/allusers', AllUsers), ('/addblog', Addblog), ('/blog', AllBlogs), ('/comment', Comment),
-     ('/allcomments', AllComments)],
+     ('/allusers', AllUsers), ('/addblog', Addblog), ('/blog', AllBlogs), ('/myblog', MyBlogs), ('/comment', Comment),
+     ('/allcomments', AllComments), ('/like', Like)],
     debug=True)

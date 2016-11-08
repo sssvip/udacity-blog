@@ -42,12 +42,14 @@ def add_or_update_like(islike, **params):
     if blog_id == '' or blog_id is None:
         return "blog_id is not allowed be a null value"
     # start to update
-    like = Like.all().filter("blog_id =", int(id)).filter("username =", username).get()
-    if like is not None:
+    like = Like.all().filter("blog_id =", int(blog_id)).filter("username =", username).get()
+    if like is None:
         # the like not exist,create one
-        like = Like(id=get_next_id(), blog_id=blog_id, username=username, islike=islike)
+        like = Like(id=get_next_id(), blog_id=int(blog_id), username=username, islike=int(islike))
         like.put()
     else:
+        if like.islike == islike:
+            return "not any changes,please don't operate repeat"
         # update the value
         like.islike = islike
         like.put()

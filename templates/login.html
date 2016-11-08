@@ -1,26 +1,12 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-<head>
-    <title>Login</title>
-    <style type="text/css">
-        .label {
-            text-align: right
-        }
-        .error {
-            color: red
-        }
-    </style>
-
-</head>
-
-<body>
+{% block content %}
 <h2>Login</h2>
 <form method="post">
     <table>
         <tr>
-            <td class="label">
-                Username
+            <td>
+                Username:
             </td>
             <td>
                 <input type="text" name="username" value="{{ username }}">
@@ -31,7 +17,7 @@
         </tr>
 
         <tr>
-            <td class="label">
+            <td>
                 Password
             </td>
             <td>
@@ -46,8 +32,7 @@
     <input type="submit">
 </form>
 <br>
-    <br>
-   I want to  <a href="signup">signup</a>
+<br>
+I want to  <a href="signup">signup</a>
 </body>
-
-</html>
+{% endblock %}

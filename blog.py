@@ -49,4 +49,4 @@ def get_blogs():
 
 
 def get_blog_by_username(username):
-    return Blog.all().filter("username =", username).get()
+    return Blog.all().filter("username =", username)
