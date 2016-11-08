@@ -182,7 +182,7 @@ class Comment(webapp2.RequestHandler):
     def get(self):
         pass
 
-    # through post to add a comment
+    # through post method to add a comment
     def post(self):
         content = self.request.get("content", '')
         if content == '':
@@ -199,6 +199,10 @@ class Comment(webapp2.RequestHandler):
             return
         result = comments.add_comment(blog_id=int(blog_id), username=username, content=content)
         self.response.write(result);
+
+    # through put method to update comment
+    def put(self):
+        self.response.write("put method success");
 
 
 # this is to test to list all comment in the db

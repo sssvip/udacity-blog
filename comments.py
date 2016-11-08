@@ -49,6 +49,32 @@ def add_comment(**params):
     return "success"
 
 
+# through the comment's id to update a comment
+def update_comment(id, **params):
+    # get the parmas defalut null value
+    username = params.get('username', '')
+    # there not check the foreigner key for username in account domain if necessary in later must be add there
+    if username == '' or username is None:
+        return "username is not allowed be a null value"
+    blog_id = params.get('blog_id', '')
+    like = params.get('like', 0)
+    if blog_id == '' or blog_id is None:
+        return "blog_id is not allowed be a null value"
+    content = params.get('content', '')
+    if content == '' or content is None:
+        return "content is not allowed be a null value"
+    # start to update
+    comment = Comments.all().filter("id =", int(id)).get()
+    if comment is not None:
+        # the first the comment is must existed in the db
+        return "comment not existed"
+    else:
+        # update the value
+        comment.content = content
+        comment.put()
+    return "success"
+
+
 def get_comments_by_blog_id(blog_id):
     return Comments.all().filter("blog_id =", blog_id)
 

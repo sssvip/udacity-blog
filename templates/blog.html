@@ -2,65 +2,76 @@
 
 {% block content %}
 
-    {% for blog in blogs %}
-        <div class="post" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
-             xmlns:v-on="http://www.w3.org/1999/xhtml">
-            <div class="post-heading">
-                <div class="post-title">
-                    {{ blog.id }}:{{ blog.title }}
-                </div>
-                <div class="post-date">
-                    {{ blog.created.strftime("%b %d, %Y") }}&nbsp;&nbsp;&nbsp;by:{{ blog.username }}
-                </div>
-            </div>
-            <div class="post-content">
-                {{ blog.content | safe }}
-            </div>
-            <br>
-            10 users&nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},1)">Like</a> &nbsp;&nbsp;&nbsp; 10
-            users &nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},0)">dislike</a>
-            <br>
-            <textarea class="content" id="{{ blog.id }}" style="width: 1000px;height: 60px;" cols="10"
-                      rows="3"></textarea>
-            <a class="addComment" style="cursor: pointer">add a
-                comment</a>
-            <br>
-            <br>
-            <b>comments:</b>
-            {% for comment in blog.comments %}
-                <div class="post-content">
-                    {{ comment.username | safe }}:{{ comment.content | safe }} {{ comment.created | safe }}
-                </div>
-            {% endfor %}
+{% for blog in blogs %}
+<div class="post" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+     xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <div class="post-heading">
+        <div class="post-title">
+            {{ blog.id }}:{{ blog.title }}
         </div>
-        <br>
-        <br>
-        <br>
-        <br>
+        <div class="post-date">
+            {{ blog.created.strftime("%b %d, %Y") }}&nbsp;&nbsp;&nbsp;by:{{ blog.username }}
+        </div>
+    </div>
+    <div class="post-content">
+        {{ blog.content | safe }}
+    </div>
+    <br>
+    10 users&nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},1)">Like</a> &nbsp;&nbsp;&nbsp; 10
+    users &nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},0)">dislike</a>
+    <br>
+    <textarea class="content" id="{{ blog.id }}" style="width: 1000px;height: 60px;" cols="10"
+              rows="3"></textarea>
+    <a class="addComment" style="cursor: pointer">add a
+        comment</a>
+    <br>
+    <br>
+    <b>comments:</b>
+    {% for comment in blog.comments %}
+    <div class="post-content">
+        {{ comment.username | safe }}:{{ comment.content | safe }} {{ comment.created | safe }} <a
+            class="updateComment">update</a>
+    </div>
     {% endfor %}
+</div>
+<br>
+<br>
+<br>
+<br>
+{% endfor %}
 
-    <script>
-        var page = new Vue({
-            el: '#page',
-            methods: {
-                like: function (blog_id, like_value) {
-                    alert(blog_id + "->>" + like_value)
-                }
+<script>
+    var page = new Vue({
+        el: '#page',
+        methods: {
+            like: function (blog_id, like_value) {
+                alert(blog_id + "->>" + like_value)
+            }
+        }
+    })
+    $(".addComment").click(function () {
+        var blog_id = $(this).prev(".content").attr("id");
+        var content = $(this).prev(".content").val();
+        $.post("/comment", {content: content, blog_id: blog_id}, function (result) {
+            if (result == 'please login...') {
+                alert("please login");
+                window.location.href = "/login";
+            } else {
+                alert(result)
             }
         })
-        $(".addComment").click(function () {
-            var blog_id = $(this).prev(".content").attr("id");
-            var content = $(this).prev(".content").val();
-            $.post("/comment", {content: content, blog_id: blog_id}, function (result) {
-                if (result == 'please login...') {
-                    alert("please login");
-                    window.location.href="/login";
-                } else {
-                    alert(result)
-                }
-            })
-        })
-    </script>
+    })
+    $(".updateComment").click(function () {
+        $.ajax({
+            type: "put",
+            url: "/comment",
+            data: "",
+            success: function (msg) {
+                alert("Data Saved: " + msg);
+            }
+        });
+    })
+</script>
 {% endblock %}
 
 
