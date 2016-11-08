@@ -21,18 +21,21 @@
     users &nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},0)">dislike</a>
     <br>
     <textarea class="content" id="{{ blog.id }}" style="width: 1000px;height: 60px;" cols="10"
-              rows="3"></textarea>
+              rows="3" placeholder="please input comment in there"></textarea>
     <a class="addComment" style="cursor: pointer">add a
         comment</a>
     <br>
     <br>
     <b>comments:</b>
-    {% for comment in blog.comments %}
+
     <div class="post-content">
-        {{ comment.username | safe }}:{{ comment.content | safe }} {{ comment.created | safe }} <a
-            class="updateComment">update</a>
+        {% for comment in blog.comments %}
+        {{ comment.username | safe }}:{{ comment.content | safe }} {{ comment.created | safe }}&nbsp;<a
+            class="updateComment" onfocus="{{ comment.id | safe }}" class="" style="cursor: pointer">update</a>&nbsp;&nbsp;<a
+            class="deleteComment" onfocus="{{ comment.id | safe }}" style="cursor: pointer">delete</a>
+        <br>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 <br>
 <br>
@@ -53,24 +56,47 @@
         var blog_id = $(this).prev(".content").attr("id");
         var content = $(this).prev(".content").val();
         $.post("/comment", {content: content, blog_id: blog_id}, function (result) {
-            if (result == 'please login...') {
-                alert("please login");
-                window.location.href = "/login";
-            } else {
+            if (check_login(result)) {
                 alert(result)
+                refresh();
             }
         })
     })
+    //update comment
     $(".updateComment").click(function () {
+        var comment_id = $(this).attr("onfocus");
+        var content = $(this).parent().parent(".post").children(".content").val()
         $.ajax({
             type: "put",
             url: "/comment",
-            data: "",
-            success: function (msg) {
-                alert("Data Saved: " + msg);
+            data: {id: comment_id, content: content},
+            success: function (result) {
+                alert(result);
+                refresh();
             }
         });
     })
+    $(".deleteComment").click(function () {
+        $.ajax({
+            type: "delete",
+            url: "/comment",
+            data: "",
+            success: function (result) {
+                alert(result);
+            }
+        });
+    })
+    function check_login(result) {
+        if (result == 'please login...') {
+            alert("please login");
+            window.location.href = "/login";
+            return false;
+        }
+        return true;
+    }
+    function refresh() {
+        window.location.href = "/blog";
+    }
 </script>
 {% endblock %}
 

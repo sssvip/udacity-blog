@@ -186,23 +186,49 @@ class Comment(webapp2.RequestHandler):
     def post(self):
         content = self.request.get("content", '')
         if content == '':
-            self.response.write("content value is not allowed null value");
+            self.response.write("content value is not allowed null value")
             return
         blog_id = self.request.get("blog_id", '')
         if blog_id == '':
-            self.response.write("blog_id value is not allowed null value");
+            self.response.write("blog_id value is not allowed null value")
             return
         # check username
         username = cookie.get_username(self)
         if username is False:
-            self.response.write("please login...");
+            self.response.write("please login...")
             return
         result = comments.add_comment(blog_id=int(blog_id), username=username, content=content)
-        self.response.write(result);
+        self.response.write(result)
 
     # through put method to update comment
     def put(self):
-        self.response.write("put method success");
+        # get the comment 'primary key' id
+        id = self.request.get("id", '')
+        if id == '':
+            self.response.write("comment id is null")
+            return
+        # check this blog whether belong this operator
+        username = cookie.get_username(self)
+        if username is False:
+            self.response.write("please login...")
+            return
+        content = self.request.get("content", '')
+        if content == '':
+            self.response.write("comment content is null,please input it on the textarea then to press update button")
+            return
+        # check the comment whether existed
+        comment = comments.get_comments_by_id(int(id))
+        if comment is None:
+            self.response.write("comment is not existed")
+            return
+        # update it
+        comment.content = content
+        comment.put()
+        self.response.write("update success")
+
+    # through delete method to update comment
+    def delete(self):
+        self.response.write("delete method test success")
 
 
 # this is to test to list all comment in the db

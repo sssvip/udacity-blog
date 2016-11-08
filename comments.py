@@ -76,7 +76,11 @@ def update_comment(id, **params):
 
 
 def get_comments_by_blog_id(blog_id):
-    return Comments.all().filter("blog_id =", blog_id)
+    return Comments.all().filter("blog_id =", blog_id).order('-last_modified')
+
+
+def get_comments_by_id(id):
+    return Comments.all().filter("id =", id).get()
 
 
 def get_all_comments():
