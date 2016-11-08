@@ -3,7 +3,7 @@
 {% block content %}
 <h2> This is My Blog </h2>
 {% for blog in blogs %}
-<div onload="window.location.Reload();" class="post" xmlns:v-on="http://www.w3.org/1999/xhtml"
+<div class="post" xmlns:v-on="http://www.w3.org/1999/xhtml"
      xmlns:v-on="http://www.w3.org/1999/xhtml"
      xmlns:v-on="http://www.w3.org/1999/xhtml">
     <div class="post-heading">
@@ -121,9 +121,19 @@
         var id = $(this).attr("onfocus");
         window.location.href = "/blog?id=" + id;
     })
-    //update blog
+    //delete blog
     $(".deleteBlog").click(function () {
-        alert("delete")
+        var id = $(this).attr("onfocus");
+        $.ajax({
+            type: "DELETE",
+            url: "/blog?id=" + id,
+            success: function (result) {
+                refreshWhenSuccess(result);
+            },
+            error: function (result) {
+                alert("sorry,some errors");
+            }
+        });
     })
 
 </script>

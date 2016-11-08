@@ -55,10 +55,10 @@ def update_blog(**params):
     content = params.get('content', '')
     if content == '':
         return "content is not allowed be a null value"
-    blog_id = params.get('blog_id', '')
-    if blog_id == '':
-        return "blog_id is null value"
-    blog = Blog.all().filter("blog_id =", blog_id)
+    id = params.get('id', '')
+    if id == '':
+        return "id is null value"
+    blog = Blog.all().filter("id =", int(id)).get()
     if blog is None:
         return "blog is not existed"
     # check the blog whether belong current user

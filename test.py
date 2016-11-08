@@ -143,7 +143,7 @@ class Blog(webapp2.RequestHandler):
         if id != '':
             temp_blog = blog.get_blog_by_id(int(id))
             if temp_blog is None:
-                self.response.write(templateUtils.reder_str("blog.html",title="asdsdasdadss"))
+                self.response.write(templateUtils.reder_str("blog.html", title="asdsdasdadss"))
                 return
             title = temp_blog.title
             content = temp_blog.content
@@ -153,7 +153,7 @@ class Blog(webapp2.RequestHandler):
         else:
             self.response.write(templateUtils.reder_str("blog.html"))
 
-    # post to add blog
+    # post to add blog or update
     def post(self):
         # check user login
         cookie.check_login(self)
@@ -164,14 +164,14 @@ class Blog(webapp2.RequestHandler):
             params['error'] = "title or content is not allowed null value"
         # through the check and add the blog to db
         params['username'] = cookie.get_username(self)
-        blog_id = self.request.get('blog_id', '')
-        # if the blog_id have value indicate this operate is update, else is add
+        id = self.request.get('id', '')
+        # if the id have value indicate this operate is update, else is add
         result = ''
-        if blog_id == '':
+        if id == '':
             result = blog.add_blog(**params)
         else:
             # to do update
-            params['blog_id'] = blog_id
+            params['id'] = id
             result = blog.update_blog(**params)
         if result == 'success':
             self.redirect('/myblog')
@@ -181,11 +181,26 @@ class Blog(webapp2.RequestHandler):
 
     # delete method to delete a blog
     def delete(self):
-        pass
-
-    # prepare update data
-    def put(self):
-        pass
+        id = self.request.get("id", '')
+        if id == '':
+            self.response.write("blog id is null")
+        # check login
+        username = cookie.get_username(self)
+        if username is False:
+            self.response.write("please login...")
+            return
+        # check the comment whether existed
+        temp_blog = blog.get_blog_by_id(int(id))
+        if temp_blog is None:
+            self.response.write("blog is not existed")
+            return
+        # check this blog whether belong this operator
+        if temp_blog.username != username:
+            self.response.write("you can update other's blog,please!")
+            return
+        # delete it
+        temp_blog.delete()
+        self.response.write("success")
 
 
 # this is to list all blogs in the db
@@ -288,7 +303,7 @@ class Comment(webapp2.RequestHandler):
         comment.put()
         self.response.write("success")
 
-    # through delete method to update comment
+    # through delete method to delete comment
     def delete(self):
         id = self.request.get("id", '')
         if id == '':
