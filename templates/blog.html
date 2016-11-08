@@ -7,7 +7,7 @@
      xmlns:v-on="http://www.w3.org/1999/xhtml">
     <div class="post-heading">
         <div class="post-title">
-            {{ blog.id }}:{{ blog.title }}
+            {{ blog.title }}
         </div>
         <div class="post-date">
             {{ blog.created.strftime("%b %d, %Y") }}&nbsp;&nbsp;&nbsp;by:{{ blog.username }}
@@ -17,7 +17,8 @@
         {{ blog.content | safe }}
     </div>
     <br>
-    10 users&nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},1)">Like</a> &nbsp;&nbsp;&nbsp; 10
+    {{ blog.like_count | safe }} users&nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},1)">Like</a>
+    &nbsp;&nbsp;&nbsp; {{ blog.dislike_count | safe }}
     users &nbsp;<a style="cursor: pointer" v-on:click="like({{ blog.id }},0)">dislike</a>
     <br>
     <textarea class="content" id="{{ blog.id }}" style="width: 1000px;height: 60px;" cols="10"
@@ -27,10 +28,9 @@
     <br>
     <br>
     <b>comments:</b>
-
     <div class="post-content">
         {% for comment in blog.comments %}
-        {{ comment.username | safe }}:{{ comment.content | safe }} {{ comment.created | safe }}&nbsp;<a
+        {{ comment.username | safe }}:{{ comment.content | safe }} {{ comment.last_modified | safe }}&nbsp;<a
             class="updateComment" onfocus="{{ comment.id | safe }}" class="" style="cursor: pointer">update</a>&nbsp;&nbsp;<a
             class="deleteComment" onfocus="{{ comment.id | safe }}" style="cursor: pointer">delete</a>
         <br>
@@ -67,22 +67,33 @@
         var comment_id = $(this).attr("onfocus");
         var content = $(this).parent().parent(".post").children(".content").val()
         $.ajax({
-            type: "put",
+            type: "PUT",
             url: "/comment",
             data: {id: comment_id, content: content},
             success: function (result) {
-                alert(result);
-                refresh();
+                if (check_login(result)) {
+                    alert(result)
+                    refresh();
+                }
+            },
+            error: function (result) {
+                alert("sorry,some errors");
             }
         });
     })
     $(".deleteComment").click(function () {
+        var comment_id = $(this).attr("onfocus");
         $.ajax({
-            type: "delete",
-            url: "/comment",
-            data: "",
+            type: "DELETE",
+            url: "/comment?id=" + comment_id,
             success: function (result) {
-                alert(result);
+                if (check_login(result)) {
+                    alert(result)
+                    refresh();
+                }
+            },
+            error: function (result) {
+                alert("sorry,some errors");
             }
         });
     })

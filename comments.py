@@ -1,5 +1,5 @@
 """
-Comments domain module include user like number for blog
+Comments domain module
 
 this module to create the domain of Comments and manage the domain
 """
@@ -11,8 +11,6 @@ class Comments(db.Model):
     id = db.IntegerProperty(required=True)
     blog_id = db.IntegerProperty(required=True)
     username = db.StringProperty(required=True)
-    # 0:default 1:like 2:dislike
-    like = db.IntegerProperty()
     content = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     last_modified = db.DateTimeProperty(auto_now=True)
@@ -38,13 +36,12 @@ def add_comment(**params):
     if username == '' or username is None:
         return "username is not allowed be a null value"
     blog_id = params.get('blog_id', '')
-    like = params.get('like', 0)
     if blog_id == '' or blog_id is None:
         return "blog_id is not allowed be a null value"
     content = params.get('content', '')
     if content == '' or content is None:
         return "content is not allowed be a null value"
-    comment = Comments(id=get_next_id(), blog_id=blog_id, like=like, username=username, content=content)
+    comment = Comments(id=get_next_id(), blog_id=blog_id, username=username, content=content)
     comment.put()
     return "success"
 
@@ -57,7 +54,6 @@ def update_comment(id, **params):
     if username == '' or username is None:
         return "username is not allowed be a null value"
     blog_id = params.get('blog_id', '')
-    like = params.get('like', 0)
     if blog_id == '' or blog_id is None:
         return "blog_id is not allowed be a null value"
     content = params.get('content', '')

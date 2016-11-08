@@ -12,6 +12,7 @@ import strUtils
 import blog
 import comments
 from datetime import datetime
+import like
 
 
 class MainPage(webapp2.RequestHandler):
@@ -161,19 +162,22 @@ class Addblog(webapp2.RequestHandler):
 # this is to list all blogs in the db
 class AllBlogs(webapp2.RequestHandler):
     def get(self):
-        blogs_with_comments = list()
+        blogs_with_comments_and_like = list()
         blogs = blog.get_blogs()
         for temp_blog in blogs:
             temp_blog.comments = list()
             all_comments = comments.get_comments_by_blog_id(temp_blog.id)
-            # all_comments = comments.get_all_comments()
+            # add comment to the blog
             if all_comments is not None:
                 for comment in all_comments:
                     temp_blog.comments.append(comment)
-                    # add this blog all comments to this blog
-                    # temp_blog.comments.append(all_comments)
-            blogs_with_comments.append(temp_blog)
-        params = dict(blogs=blogs_with_comments)
+            # add like to the blog
+            like_count = like.get_like_count_by_blog_id(1, temp_blog.id)
+            dislike_count = like.get_like_count_by_blog_id(1, temp_blog.id)
+            temp_blog.like_count = like_count
+            temp_blog.dislike_count = dislike_count
+            blogs_with_comments_and_like.append(temp_blog)
+        params = dict(blogs=blogs_with_comments_and_like)
         self.response.write(templateUtils.reder_str("blog.html", **params))
 
 
@@ -207,7 +211,7 @@ class Comment(webapp2.RequestHandler):
         if id == '':
             self.response.write("comment id is null")
             return
-        # check this blog whether belong this operator
+        # check login
         username = cookie.get_username(self)
         if username is False:
             self.response.write("please login...")
@@ -221,6 +225,10 @@ class Comment(webapp2.RequestHandler):
         if comment is None:
             self.response.write("comment is not existed")
             return
+        # check this blog whether belong this operator
+        if comment.username != username:
+            self.response.write("you can update other's comment,please")
+            return
         # update it
         comment.content = content
         comment.put()
@@ -228,7 +236,26 @@ class Comment(webapp2.RequestHandler):
 
     # through delete method to update comment
     def delete(self):
-        self.response.write("delete method test success")
+        id = self.request.get("id", '')
+        if id == '':
+            self.response.write("comment id is null")
+        # check login
+        username = cookie.get_username(self)
+        if username is False:
+            self.response.write("please login...")
+            return
+        # check the comment whether existed
+        comment = comments.get_comments_by_id(int(id))
+        if comment is None:
+            self.response.write("comment is not existed")
+            return
+        # check this blog whether belong this operator
+        if comment.username != username:
+            self.response.write("you can update other's comment,please")
+            return
+        # delete it
+        comment.delete()
+        self.response.write("delete success")
 
 
 # this is to test to list all comment in the db
