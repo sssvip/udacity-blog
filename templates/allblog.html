@@ -1,19 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2> This is My Blog </h2>
+<h2> All User's Blog </h2>
 {% for blog in blogs %}
-<div onload="window.location.Reload();" class="post" xmlns:v-on="http://www.w3.org/1999/xhtml"
-     xmlns:v-on="http://www.w3.org/1999/xhtml"
+<div class="post" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
      xmlns:v-on="http://www.w3.org/1999/xhtml">
     <div class="post-heading">
         <div class="post-title">
-            {{ blog.id }}:{{ blog.title }}
+            {{ blog.title }}
         </div>
         <div class="post-date">
-            {{ blog.created.strftime("%b %d, %Y") }}&nbsp;&nbsp;&nbsp;by:{{ blog.username }} <a
-                class="updateBlog" onfocus="{{ blog.id }}" style="cursor: pointer">update</a>&nbsp;&nbsp;<a
-                class="deleteBlog" onfocus="{{ blog.id }}" style="cursor: pointer">delete</a>
+            {{ blog.created.strftime("%b %d, %Y") }}&nbsp;&nbsp;&nbsp;by:{{ blog.username }}
         </div>
     </div>
     <div class="post-content">
@@ -106,7 +103,7 @@
         return true;
     }
     function refresh() {
-        window.location.href = "/myblog";
+        window.location.href = "/allblog";
     }
     function refreshWhenSuccess(result) {
         if (check_login(result)) {
@@ -116,16 +113,6 @@
             }
         }
     }
-    //update blog
-    $(".updateBlog").click(function () {
-        var id = $(this).attr("onfocus");
-        window.location.href = "/blog?id=" + id;
-    })
-    //update blog
-    $(".deleteBlog").click(function () {
-        alert("delete")
-    })
-
 </script>
 {% endblock %}
 

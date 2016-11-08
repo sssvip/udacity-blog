@@ -52,7 +52,7 @@ class Post(db.Model):
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
-        return render_str("blog.html", p=self)
+        return render_str("allblog.html", p=self)
 
 
 class BlogFront(BlogHandler):
@@ -75,7 +75,7 @@ class PostPage(BlogHandler):
 
 class NewPost(BlogHandler):
     def get(self):
-        self.render("addblog.html")
+        self.render("blog.html")
 
     def post(self):
         subject = self.request.get('subject')
@@ -87,7 +87,7 @@ class NewPost(BlogHandler):
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
-            self.render("addblog.html", subject=subject, content=content, error=error)
+            self.render("blog.html", subject=subject, content=content, error=error)
 
 
 ###### Unit 2 HW's

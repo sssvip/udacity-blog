@@ -4,10 +4,12 @@ body {
     padding: 10px;
     color: #333;
 }
-#page{
+
+#page {
     width: 1000px;
     margin: 0 auto;
 }
+
 h2 {
     font-size: 24px;
     font-weight: bold;
@@ -19,14 +21,13 @@ h2 {
 }
 
 label {
-  display: block;
-  font-size: 20px;
+    display: block;
+    font-size: 20px;
 }
 
 label + label {
     margin-top: 20px;
 }
-
 
 .main-title {
     font-size: 30px;
@@ -59,6 +60,7 @@ label + label {
 }
 
 .post-content {
-    margin-top: 5px;
+    margin-top: 10px;
+    word-break: break-all;
 }
 

@@ -11,7 +11,7 @@ class Blog(db.Model):
     title = db.StringProperty(required=True)
     content = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
-
+    last_modified = db.DateTimeProperty(auto_now=True)
 
 def get_blogs_count():
     blogs = db.GqlQuery("select * from Blog")
@@ -43,10 +43,41 @@ def add_blog(**params):
     return "success"
 
 
+def update_blog(**params):
+    # get the parmas defalut null value
+    username = params.get('username', '')
+    # there not check the foreigner key for username in account domain if necessary in later must be add there
+    if username == '':
+        return "username is not allowed be a null value"
+    title = params.get('title', '')
+    if title == '':
+        return "title is not allowed be a null value"
+    content = params.get('content', '')
+    if content == '':
+        return "content is not allowed be a null value"
+    blog_id = params.get('blog_id', '')
+    if blog_id == '':
+        return "blog_id is null value"
+    blog = Blog.all().filter("blog_id =", blog_id)
+    if blog is None:
+        return "blog is not existed"
+    # check the blog whether belong current user
+    if blog.username != username:
+        return "you can't update other's blog"
+    blog.content = content
+    blog.title = title
+    blog.put()
+    return "success"
+
+
 def get_blogs():
-    blogs = Blog.all().order('-created')
+    blogs = Blog.all().order('-last_modified')
     return blogs
 
 
 def get_blog_by_username(username):
-    return Blog.all().filter("username =", username)
+    return Blog.all().filter("username =", username).order('-last_modified')
+
+
+def get_blog_by_id(id):
+    return Blog.all().filter("id =", id).get()

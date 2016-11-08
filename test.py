@@ -134,13 +134,26 @@ class AllUsers(webapp2.RequestHandler):
         self.response.write(usernames)
 
 
-# this is to add blog
-class Addblog(webapp2.RequestHandler):
+# this is to blog opreat
+class Blog(webapp2.RequestHandler):
     def get(self):
         # check user login
         cookie.check_login(self)
-        self.response.write(templateUtils.reder_str("addblog.html"))
+        id = self.request.get("id", '')
+        if id != '':
+            temp_blog = blog.get_blog_by_id(int(id))
+            if temp_blog is None:
+                self.response.write(templateUtils.reder_str("blog.html",title="asdsdasdadss"))
+                return
+            title = temp_blog.title
+            content = temp_blog.content
+            params = dict(title=title, content=content)
+            params['id'] = temp_blog.id
+            self.response.write(templateUtils.reder_str("blog.html", **params))
+        else:
+            self.response.write(templateUtils.reder_str("blog.html"))
 
+    # post to add blog
     def post(self):
         # check user login
         cookie.check_login(self)
@@ -151,16 +164,32 @@ class Addblog(webapp2.RequestHandler):
             params['error'] = "title or content is not allowed null value"
         # through the check and add the blog to db
         params['username'] = cookie.get_username(self)
-        result = blog.add_blog(**params)
+        blog_id = self.request.get('blog_id', '')
+        # if the blog_id have value indicate this operate is update, else is add
+        result = ''
+        if blog_id == '':
+            result = blog.add_blog(**params)
+        else:
+            # to do update
+            params['blog_id'] = blog_id
+            result = blog.update_blog(**params)
         if result == 'success':
             self.redirect('/myblog')
         else:
             params['error'] = result
-            self.response.write(templateUtils.reder_str("addblog.html", **params))
+            self.response.write(templateUtils.reder_str("blog.html", **params))
+
+    # delete method to delete a blog
+    def delete(self):
+        pass
+
+    # prepare update data
+    def put(self):
+        pass
 
 
 # this is to list all blogs in the db
-class AllBlogs(webapp2.RequestHandler):
+class AllBlog(webapp2.RequestHandler):
     def get(self):
         blogs_with_comments_and_like = list()
         blogs = blog.get_blogs()
@@ -178,7 +207,7 @@ class AllBlogs(webapp2.RequestHandler):
             temp_blog.dislike_count = dislike_count
             blogs_with_comments_and_like.append(temp_blog)
         params = dict(blogs=blogs_with_comments_and_like)
-        self.response.write(templateUtils.reder_str("blog.html", **params))
+        self.response.write(templateUtils.reder_str("allblog.html", **params))
 
 
 # this is to list all blogs in the db
@@ -316,6 +345,6 @@ class Like(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication(
     [('/', MainPage), ('/welcome', Welcome), ('/signup', Signup), ('/login', Login), ('/logout', Logout),
-     ('/allusers', AllUsers), ('/addblog', Addblog), ('/blog', AllBlogs), ('/myblog', MyBlogs), ('/comment', Comment),
+     ('/allusers', AllUsers), ('/blog', Blog), ('/allblog', AllBlog), ('/myblog', MyBlogs), ('/comment', Comment),
      ('/allcomments', AllComments), ('/like', Like)],
     debug=True)
