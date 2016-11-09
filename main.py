@@ -149,6 +149,7 @@ class Blog(webapp2.RequestHandler):
             content = temp_blog.content
             params = dict(title=title, content=content)
             params['id'] = temp_blog.id
+            params['cancel'] = '<a href="/myblog">Cancle Edit</a>'
             self.response.write(templateUtils.reder_str("blog.html", **params))
         else:
             self.response.write(templateUtils.reder_str("blog.html"))
@@ -287,7 +288,7 @@ class Comment(webapp2.RequestHandler):
             return
         content = self.request.get("content", '')
         if content == '':
-            self.response.write("comment content is null,please input it on the textarea then to press update button")
+            self.response.write("comment content is null                                        please input it on the textarea(above the button 'add a comment') then to press update button. ")
             return
         # check the comment whether existed
         comment = comments.get_comments_by_id(int(id))
